@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/logs/logs"
+    "pages/tabs/index/index",
+    "pages/index/product-detail/index"
   ],
   "window": {
     "navigationBarTextStyle": "white",
