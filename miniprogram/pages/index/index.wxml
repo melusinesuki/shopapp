@@ -1,0 +1,7 @@
+<!--index.wxml-->
+<view class="container">
+  <text class="center-text">{{message}}</text>
+</view>
+<view class="container2">
+  <text class="center-text">{{message}}</text>
+</view>
