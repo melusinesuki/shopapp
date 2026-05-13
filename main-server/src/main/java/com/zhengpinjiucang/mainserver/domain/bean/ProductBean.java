@@ -11,10 +11,21 @@ import lombok.ToString;
 @NoArgsConstructor
 
 public class ProductBean {
+    private Long longId;
     private String strNo;
     private String strSurface;
     private String strTitle;
-    private Integer intPrice;//分钱
-    private String strUse;//分钱
+    private Integer intPrice;
+    private String strUse;
+    private String strContent;
+    private Integer intInventory;
+    private Integer intSales;
+    private long createdTime;
+    private long longUpdateTime;
+    private Integer intIsDeleted;
+    private long longDeleteTime;
+
+
+
 
 }
