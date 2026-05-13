@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.ProductMapper">
+    <select id="list" resultType="com.zhengpinjiucang.mainserver.domain.bean.ProductBean">
+        select * from product
+    </select>
+    <select id="detail" resultType="com.zhengpinjiucang.mainserver.domain.bean.ProductBean">
+        select * from product where str_no = #{strNo}
+    </select>
+</mapper>
