@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 @Data
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 
 public class ProductBean {
@@ -20,10 +19,16 @@ public class ProductBean {
     private String strContent;
     private Integer intInventory;
     private Integer intSales;
-    private long createdTime;
-    private long longUpdateTime;
+    private Long longCreatedTime;
+    private Long longUpdateTime;
     private Integer intIsDeleted;
-    private long longDeleteTime;
+    private Long longDeleteTime;
+
+
+    private Long startCreatedTime;
+    private Long lastCreatedTime;
+    private Integer startPrice;
+    private Integer lastSales;
 
 
 

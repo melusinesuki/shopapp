@@ -3,11 +3,45 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.ProductMapper">
-    <select id="selectOne" resultType="com.zhengpinjiucang.mainserver.domain.bean.ProductBean">
+    <resultMap id="productMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.ProductBean">
+        <id column="id" property="longId"/>
+        <result column="content" property="strContent"/>
+        <result column="inventory" property="intInventory"/>
+        <result column="sales" property="intSales"/>
+        <result column="created_at" property="longCreatedTime"/>
+        <result column="updated_at" property="longUpdateTime"/>
+        <result column="deleted_time" property="longDeleteTime"/>
+    </resultMap>
+    <select id="select"  resultMap="productMap">
+        select  id ,str_surface, str_title, int_price ,sales ,inventory ,created_at
+        from product
+        <where>
+            is_deleted = 0
+            <if test="strTitle !=null and strTitle !=''">
+                    and str_title like concat("%",#{strTitle},"%")
+            </if>
+            <if test="startCreatedTime !=null">
+                and created_at > #{startCreatedTime}
+            </if>
+            <if test="lastCreatedTime !=null">
+                and created_at &lt; #{lastCreatedTime}
+            </if>
+            <if test="startPrice !=null">
+                and int_Price >  #{startPrice}
+            </if>
+            <if test="lastSales !=null">
+                and sales &lt; #{lastSales}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOne"  resultMap="productMap">
         select * from product
         <where>
+            is_deleted=0
             <if test="longId != null">
-                long_id = #{longId}
+                and id = #{longId}
             </if>
             <if test="strNo != null">
                 and str_no = #{strNo}
@@ -15,3 +49,5 @@
         </where>
     </select>
 </mapper>
+
+
