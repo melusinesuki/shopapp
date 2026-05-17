@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.MemberAccountMapper">
+
+    <select id="select" resultType="com.zhengpinjiucang.mainserver.domain.bean.MemberAccountBean">
+        select * from member_account
+        <where>
+            is_deleted = 0
+            <if test="strUsername != null and strUsername != ''">
+                and username = #{strUsername}
+            </if>
+            <if test="strCellphone != null and strCellphone != ''">
+                and cellphone = #{strCellphone}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOne" resultType="com.zhengpinjiucang.mainserver.domain.bean.MemberAccountBean">
+        select * from member_account
+        <where>
+            is_deleted = 0
+            <if test="longId != null">
+                and id = #{longId}
+            </if>
+            <if test="strUsername != null">
+                and username = #{strUsername}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into member_account (id, username, password_hash, nickname, avatar,
+                                    gender, created_time, update_time, birthday, cellphone)
+        values (#{longId}, #{strUsername}, #{strPasswordHash}, #{strNickname}, #{strAvatar},
+                #{intGender}, #{longCreatedTime}, #{longUpdateTime}, #{birthday}, #{strCellphone})
+    </insert>
+
+    <update id="update">
+        update member_account
+        <set>
+            <if test="strPasswordHash != null">password_hash = #{strPasswordHash},</if>
+            <if test="strNickname != null">nickname = #{strNickname},</if>
+            <if test="strAvatar != null">avatar = #{strAvatar},</if>
+            <if test="intGender != null">gender = #{intGender},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="strCellphone != null">cellphone = #{strCellphone},</if>
+            update_time = #{longUpdateTime}
+        </set>
+        where id = #{longId} and is_deleted = 0
+    </update>
+
+    <delete id="delete">
+        update member_account
+        set is_deleted = 1, deleted_time = #{longDeleteTime}
+        where id = #{longId}
+    </delete>
+
+</mapper>
