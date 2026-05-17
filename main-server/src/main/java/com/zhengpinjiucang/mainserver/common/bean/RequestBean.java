@@ -1,4 +1,4 @@
-package com.zhengpinjiucang.mainserver.domain.bean;
+package com.zhengpinjiucang.mainserver.common.bean;
 
 import lombok.Data;
 

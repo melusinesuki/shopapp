@@ -2,7 +2,7 @@ package com.zhengpinjiucang.mainserver.domain.controller;
 import com.github.pagehelper.PageInfo;
 import com.zhengpinjiucang.mainserver.common.bean.ResultBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ProductBean;
-import com.zhengpinjiucang.mainserver.domain.bean.RequestBean;
+import com.zhengpinjiucang.mainserver.common.bean.RequestBean;
 import com.zhengpinjiucang.mainserver.domain.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

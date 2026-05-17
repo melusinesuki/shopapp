@@ -29,4 +29,11 @@ public class MemberAccountController {
         memberAccountService.sendEmailCode(bean);
         return new ResultBean(200, "验证码已发送", null);
     }
+
+    @PostMapping("/member-account/login")
+    public ResultBean login(@RequestBody MemberAccountBean bean) {
+        log.info("/member-account/login, 请求参数:{}", bean);
+        String token = memberAccountService.login(bean);
+        return new ResultBean(200, "登录成功", token);
+    }
 }

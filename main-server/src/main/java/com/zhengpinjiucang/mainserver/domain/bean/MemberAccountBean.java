@@ -25,4 +25,6 @@ public class MemberAccountBean {
     private Long longDeleteTime;
     private Date birthday;
     private String strCellphone;
+    private String strCode;
+
 }

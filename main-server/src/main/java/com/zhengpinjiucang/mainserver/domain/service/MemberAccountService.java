@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
+import cn.hutool.jwt.JWTUtil;
+import com.zhengpinjiucang.mainserver.domain.mapper.MessageCodeMapper;
+import java.util.HashMap;
+
 
 import java.util.Random;
 
@@ -22,6 +26,9 @@ public class MemberAccountService {
     private MemberAccountMapper memberAccountMapper;
     @Autowired
     private JavaMailSenderImpl mailSender;
+    @Autowired
+    private MessageCodeMapper messageCodeMapper;
+
 
     public void register(MemberAccountBean bean) {
         log.debug("用户注册, 检查参数");
@@ -60,12 +67,16 @@ public class MemberAccountService {
         }
     }
     public void sendEmailCode(MemberAccountBean bean) {
+        log.debug("发送邮件,检查参数");
         String email = bean.getStrUsername();
 
         if (!email.matches("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")) {
             throw new NormalException("邮箱格式错误");
         }
+        log.debug("发送邮件,构建验证码");
+
         String code="";
+
         for(int i=0;i<4;i++){
             int a=new Random().nextInt(10);
             code+=a;
@@ -77,15 +88,82 @@ public class MemberAccountService {
         message.setTo(email);
         message.setSubject("[pronhub]邮箱验证码");
         message.setText("[pornhub]您的邮箱验证码为"+code);
+
         mailSender.send(message);
         log.debug("发送邮件，保存状态码");
+
         MessageCodeBean messageCodeBean = new MessageCodeBean();
+        messageCodeBean.setStrEmail(email);
+        messageCodeBean.setStrCode(code);
+        messageCodeBean.setLongCreatedTime(System.currentTimeMillis());
 
+        // 先删旧的，防止重复发送同一邮箱主键冲突
+        MessageCodeBean deleteBean = new MessageCodeBean();
+        deleteBean.setStrEmail(email);
+        messageCodeMapper.delete(deleteBean);
 
-
-
-
+        messageCodeMapper.insert(messageCodeBean);
 
     }
+    public String login(MemberAccountBean bean) {
+        log.debug("用户登录,检查参数");
+        if (bean == null) {
+            throw new NormalException("参数错误");
+        }
+        if (!bean.getStrUsername().matches("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")) {
+            throw new NormalException("邮箱格式错误");
+        }
+        if (bean.getStrCode() == null || bean.getStrCode().isEmpty()) {
+            throw new NormalException("验证码不能为空");
+        }
+
+        log.debug("用户登录,检查验证码");
+        MessageCodeBean messageCodeBeanQ = new MessageCodeBean();
+        messageCodeBeanQ.setStrEmail(bean.getStrUsername());
+        MessageCodeBean messageCodeBean = messageCodeMapper.selectOne(messageCodeBeanQ);
+        if (messageCodeBean == null) {
+            throw new NormalException("验证码不正确");
+        }
+        if (messageCodeBean.getLongCreatedTime() + 1000 * 60 * 5 < System.currentTimeMillis()) {
+            throw new NormalException("验证码已过期");
+        }
+        if (!messageCodeBean.getStrCode().equals(bean.getStrCode())) {
+            throw new NormalException("验证码不正确");
+        }
+        messageCodeMapper.delete(messageCodeBean);
+
+        log.debug("用户登录,检查用户是否存在");
+        MemberAccountBean memberAccountBeanQ = new MemberAccountBean();
+        memberAccountBeanQ.setStrUsername(bean.getStrUsername());
+        MemberAccountBean memberAccountBeanResult = memberAccountMapper.selectOne(memberAccountBeanQ);
+        if (memberAccountBeanResult == null) {
+            memberAccountBeanQ.setLongId(IdUtil.getSnowflakeNextId());
+            memberAccountBeanQ.setStrUsername(bean.getStrUsername());
+            memberAccountBeanQ.setStrPasswordHash("");
+            memberAccountBeanQ.setStrNickname("珍品酒友");
+            memberAccountBeanQ.setStrAvatar("https://ts3.tc.mm.bing.net/th/id/OIP-C.D_0j-989FquhjlnrH_gUbgHaHa?cb=thfc1&rs =1&pid=ImgDetMain&o=7&rm=3");
+            memberAccountBeanQ.setIntGender(1);
+            memberAccountBeanQ.setBirthday(null);
+            memberAccountBeanQ.setStrCellphone("");
+            memberAccountBeanQ.setLongCreatedTime(System.currentTimeMillis());
+            memberAccountBeanQ.setLongUpdateTime(System.currentTimeMillis());
+            int inserted = memberAccountMapper.insert(memberAccountBeanQ);
+            if (inserted != 1) {
+                throw new NormalException("注册失败");
+            }
+            memberAccountBeanResult = memberAccountBeanQ;
+        }
+
+        HashMap<String, Object> claims = new HashMap<>();
+        claims.put("id", memberAccountBeanResult.getLongId());
+
+        String token = JWTUtil.createToken(claims, "12345678".getBytes());
+        System.out.println( token);
+        return token;
+    }
+    public static void main(String[] args) {
+        System.out.println(System.currentTimeMillis());
+    }
+
 
 }

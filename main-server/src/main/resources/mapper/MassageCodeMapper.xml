@@ -1,6 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.MessageCodeMapper">
 
-</beans>
+    <resultMap id="messageCodeMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.MessageCodeBean">
+        <result column="email" property="strEmail"/>
+        <result column="code" property="strCode"/>
+        <result column="created_time" property="longCreatedTime"/>
+    </resultMap>
+
+    <select id="selectOne" resultMap="messageCodeMap">
+        select * from message_code
+        <where>
+            email = #{strEmail}
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into message_code(email, code, created_time)
+        values(#{strEmail}, #{strCode}, #{longCreatedTime})
+    </insert>
+
+    <delete id="delete">
+        delete from message_code where email = #{strEmail}
+    </delete>
+</mapper>
