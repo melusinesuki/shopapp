@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.ShopCartMapper">
+
+    <resultMap id="shopCartMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.ShopCartBean">
+        <id column="id" property="longId"/>
+        <result column="product_id" property="longProductId"/>
+        <result column="member_account_id" property="longMemberAccountId"/>
+        <result column="num" property="intNum"/>
+        <result column="created_time" property="longCreatedTime"/>
+        <result column="updated_time" property="longUpdatedTime"/>
+    </resultMap>
+
+    <select id="select" resultMap="shopCartMap">
+        select * from shop_cart
+        where member_account_id = #{longMemberAccountId}
+        order by created_time desc
+    </select>
+
+    <insert id="insert">
+        insert into shop_cart(id, product_id, member_account_id, num, created_time, updated_time)
+        values (#{longId}, #{longProductId}, #{longMemberAccountId}, #{intNum}, #{longCreatedTime}, #{longUpdatedTime})
+    </insert>
+
+    <update id="update">
+        update shop_cart
+        set num = #{intNum}, updated_time = #{longUpdatedTime}
+        where product_id = #{longProductId} and member_account_id = #{longMemberAccountId}
+    </update>
+
+    <delete id="delete">
+        delete from shop_cart
+        where product_id = #{longProductId} and member_account_id = #{longMemberAccountId}
+    </delete>
+</mapper>

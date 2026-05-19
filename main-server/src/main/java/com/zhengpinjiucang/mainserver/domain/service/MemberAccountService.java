@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
-import cn.hutool.jwt.JWTUtil;
+import com.zhengpinjiucang.mainserver.common.util.JWTUtils;
 import com.zhengpinjiucang.mainserver.domain.mapper.MessageCodeMapper;
 import java.util.HashMap;
 
@@ -157,13 +157,18 @@ public class MemberAccountService {
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("id", memberAccountBeanResult.getLongId());
 
-        String token = JWTUtil.createToken(claims, "12345678".getBytes());
-        System.out.println( token);
+        String token = JWTUtils.createToken(claims);
         return token;
     }
-    public static void main(String[] args) {
-        System.out.println(System.currentTimeMillis());
+    public MemberAccountBean detail(MemberAccountBean bean) {
+        if (bean.getLongId() == null) {
+            throw new NormalException("用户ID不能为空");
+        }
+        MemberAccountBean result = memberAccountMapper.selectOne(bean);
+        if (result == null) {
+            throw new NormalException("用户不存在");
+        }
+        return result;
     }
-
 
 }

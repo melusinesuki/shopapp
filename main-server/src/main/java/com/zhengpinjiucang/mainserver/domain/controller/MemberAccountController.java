@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @Slf4j
 public class MemberAccountController {
@@ -35,5 +37,22 @@ public class MemberAccountController {
         log.info("/member-account/login, 请求参数:{}", bean);
         String token = memberAccountService.login(bean);
         return new ResultBean(200, "登录成功", token);
+    }
+
+    @PostMapping("/member-account/detail")
+    public ResultBean detail(@RequestBody MemberAccountBean bean) {
+        log.info("/member-account/detail, 请求参数:{}", bean);
+        MemberAccountBean result = memberAccountService.detail(bean);
+        return new ResultBean(200, "查询成功", result);
+    }
+
+    @PostMapping("/member-account/me")
+    public ResultBean me(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        log.info("/member-account/me, userId:{}", userId);
+        MemberAccountBean bean = new MemberAccountBean();
+        bean.setLongId(userId);
+        MemberAccountBean result = memberAccountService.detail(bean);
+        return new ResultBean(200, "查询成功", result);
     }
 }

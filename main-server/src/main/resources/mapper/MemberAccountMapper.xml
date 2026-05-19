@@ -4,7 +4,23 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.MemberAccountMapper">
 
-    <select id="select" resultType="com.zhengpinjiucang.mainserver.domain.bean.MemberAccountBean">
+    <resultMap id="memberAccountMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.MemberAccountBean">
+        <result column="id" property="longId"/>
+        <result column="username" property="strUsername"/>
+        <result column="password_hash" property="strPasswordHash"/>
+        <result column="nickname" property="strNickname"/>
+        <result column="avatar" property="strAvatar"/>
+        <result column="gender" property="intGender"/>
+        <result column="created_time" property="longCreatedTime"/>
+        <result column="update_time" property="longUpdateTime"/>
+        <result column="is_deleted" property="intIsDeleted"/>
+        <result column="deleted_time" property="longDeleteTime"/>
+        <result column="birthday" property="birthday"/>
+        <result column="cellphone" property="strCellphone"/>
+    </resultMap>
+
+    <select id="select" resultMap="memberAccountMap">
         select * from member_account
         <where>
             is_deleted = 0
@@ -17,7 +33,7 @@
         </where>
     </select>
 
-    <select id="selectOne" resultType="com.zhengpinjiucang.mainserver.domain.bean.MemberAccountBean">
+    <select id="selectOne" resultMap="memberAccountMap">
         select * from member_account
         <where>
             is_deleted = 0

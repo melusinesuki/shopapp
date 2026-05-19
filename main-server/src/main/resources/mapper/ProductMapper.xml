@@ -6,11 +6,17 @@
     <resultMap id="productMap"
                type="com.zhengpinjiucang.mainserver.domain.bean.ProductBean">
         <id column="id" property="longId"/>
+        <result column="str_no" property="strNo"/>
+        <result column="str_surface" property="strSurface"/>
+        <result column="str_title" property="strTitle"/>
+        <result column="int_price" property="intPrice"/>
+        <result column="str_use" property="strUse"/>
         <result column="content" property="strContent"/>
         <result column="inventory" property="intInventory"/>
         <result column="sales" property="intSales"/>
         <result column="created_at" property="longCreatedTime"/>
         <result column="updated_at" property="longUpdateTime"/>
+        <result column="is_deleted" property="intIsDeleted"/>
         <result column="deleted_time" property="longDeleteTime"/>
     </resultMap>
     <select id="select"  resultMap="productMap">
