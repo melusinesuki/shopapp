@@ -12,4 +12,6 @@ public class ShopCartBean {
     private Long longCreatedTime;
     private Long longUpdatedTime;
 
+    private ProductBean productBean;
+
 }

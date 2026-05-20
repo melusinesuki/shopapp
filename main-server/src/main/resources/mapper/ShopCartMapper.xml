@@ -20,6 +20,11 @@
         order by created_time desc
     </select>
 
+    <select id="selectOne" resultMap="shopCartMap">
+        select * from shop_cart
+        where product_id = #{longProductId} and member_account_id = #{longMemberAccountId}
+    </select>
+
     <insert id="insert">
         insert into shop_cart(id, product_id, member_account_id, num, created_time, updated_time)
         values (#{longId}, #{longProductId}, #{longMemberAccountId}, #{intNum}, #{longCreatedTime}, #{longUpdatedTime})

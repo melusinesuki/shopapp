@@ -10,6 +10,8 @@ public interface ShopCartMapper {
 
     List<ShopCartBean> select(ShopCartBean bean);
 
+    ShopCartBean selectOne(ShopCartBean bean);
+
     int insert(ShopCartBean bean);
 
     int update(ShopCartBean bean);

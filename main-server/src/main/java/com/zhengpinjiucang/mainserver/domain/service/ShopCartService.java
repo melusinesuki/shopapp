@@ -25,7 +25,16 @@ public class ShopCartService {
     public List<ShopCartBean> listAll() {
         ShopCartBean bean = new ShopCartBean();
         bean.setLongMemberAccountId(SecurityUtils.getId());
-        return shopCartMapper.select(bean);
+        List<ShopCartBean> shopCartBeans = shopCartMapper.select(bean);
+
+        for (ShopCartBean shopCartBean : shopCartBeans) {
+            ProductBean productBean = new ProductBean();
+            productBean.setLongId(shopCartBean.getLongProductId());
+            ProductBean productBeanResult = productMapper.selectOne(productBean);
+            shopCartBean.setProductBean(productBeanResult);
+        }
+
+        return shopCartBeans;
     }
 
     public void save(ShopCartBean bean) {
@@ -41,16 +50,30 @@ public class ShopCartService {
             throw new NormalException("产品不存在");
         }
 
-        log.debug("添加到购物车,补充参数");
-        bean.setLongId(IdUtil.getSnowflakeNextId());
-        bean.setLongMemberAccountId(SecurityUtils.getId());
-        bean.setIntNum(1);
-        bean.setLongCreatedTime(System.currentTimeMillis());
-        bean.setLongUpdatedTime(System.currentTimeMillis());
-        log.debug("添加到购物车,执行操作");
-        int inserted = shopCartMapper.insert(bean);
-        if (inserted != 1) {
-            throw new NormalException("添加失败");
+        log.debug("添加到购物车,检查产品是否已经存在于购物车中");
+        ShopCartBean shopCartBeanQ = new ShopCartBean();
+        shopCartBeanQ.setLongProductId(bean.getLongProductId());
+        shopCartBeanQ.setLongMemberAccountId(SecurityUtils.getId());
+        ShopCartBean shopCartBeanResult = shopCartMapper.selectOne(shopCartBeanQ);
+        if (shopCartBeanResult == null) {
+            log.debug("添加到购物车,补充参数");
+            bean.setLongId(IdUtil.getSnowflakeNextId());
+            bean.setLongMemberAccountId(SecurityUtils.getId());
+            bean.setIntNum(1);
+            bean.setLongCreatedTime(System.currentTimeMillis());
+            bean.setLongUpdatedTime(System.currentTimeMillis());
+            log.debug("添加到购物车,执行操作");
+            int inserted = shopCartMapper.insert(bean);
+            if (inserted != 1) {
+                throw new NormalException("添加失败");
+            }
+        } else {
+            shopCartBeanResult.setIntNum(shopCartBeanResult.getIntNum() + 1);
+            shopCartBeanResult.setLongUpdatedTime(System.currentTimeMillis());
+            int updated = shopCartMapper.update(shopCartBeanResult);
+            if (updated != 1) {
+                throw new NormalException("添加失败");
+            }
         }
     }
 
