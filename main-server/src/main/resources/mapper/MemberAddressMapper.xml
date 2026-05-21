@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.MemberAddressMapper">
+
+    <resultMap id="memberAddressMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.MemberAddressBean">
+        <id column="id" property="longId"/>
+        <result column="member_account_id" property="longMemberAccountId"/>
+        <result column="nickname" property="strNickname"/>
+        <result column="cellphone" property="strCellphone"/>
+        <result column="provinces" property="strProvinces"/>
+        <result column="city" property="strCity"/>
+        <result column="district" property="strDistrict"/>
+        <result column="is_default" property="intIsDefault"/>
+        <result column="detail_address" property="strDetailAddress"/>
+        <result column="created_time" property="longCreateTime"/>
+        <result column="updated_time" property="longUpdateTime"/>
+    </resultMap>
+
+    <select id="select" resultMap="memberAddressMap">
+        select * from member_address
+        where member_account_id = #{longMemberAccountId}
+        order by is_default desc, created_time desc
+    </select>
+
+    <select id="selectOne" resultMap="memberAddressMap">
+        select * from member_address
+        <where>
+            member_account_id = #{longMemberAccountId}
+            <if test="longId != null">
+                and id = #{longId}
+            </if>
+            <if test="intIsDefault != null">
+                and is_default = #{intIsDefault}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into member_address(id, member_account_id, nickname, cellphone, provinces, city,
+                                   district, is_default, detail_address, created_time, updated_time)
+        values (#{longId}, #{longMemberAccountId}, #{strNickname}, #{strCellphone}, #{strProvinces}, #{strCity},
+                #{strDistrict}, #{intIsDefault}, #{strDetailAddress}, #{longCreateTime}, #{longUpdateTime})
+    </insert>
+
+    <update id="update">
+        update member_address
+        <set>
+            <if test="strNickname != null">
+                nickname = #{strNickname},
+            </if>
+            <if test="strCellphone != null">
+                cellphone = #{strCellphone},
+            </if>
+            <if test="strProvinces != null">
+                provinces = #{strProvinces},
+            </if>
+            <if test="strCity != null">
+                city = #{strCity},
+            </if>
+            <if test="strDistrict != null">
+                district = #{strDistrict},
+            </if>
+            <if test="intIsDefault != null">
+                is_default = #{intIsDefault},
+            </if>
+            <if test="strDetailAddress != null">
+                detail_address = #{strDetailAddress},
+            </if>
+            <if test="longUpdateTime != null">
+                updated_time = #{longUpdateTime},
+            </if>
+        </set>
+        where id = #{longId}
+        and member_account_id = #{longMemberAccountId}
+    </update>
+
+    <delete id="delete">
+        delete from member_address
+        where id = #{longId}
+        and member_account_id = #{longMemberAccountId}
+    </delete>
+
+</mapper>
