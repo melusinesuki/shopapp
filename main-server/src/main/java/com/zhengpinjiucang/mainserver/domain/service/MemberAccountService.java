@@ -86,8 +86,8 @@ public class MemberAccountService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("1194087088@qq.com");
         message.setTo(email);
-        message.setSubject("[pronhub]邮箱验证码");
-        message.setText("[pornhub]您的邮箱验证码为"+code);
+        message.setSubject("[珍品酒仓]邮箱验证码");
+        message.setText("[珍品酒仓]您的邮箱验证码为"+code);
 
         mailSender.send(message);
         log.debug("发送邮件，保存状态码");

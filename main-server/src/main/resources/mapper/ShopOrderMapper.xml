@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.ShopOrderMapper">
+
+    <resultMap id="shopOrderMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.ShopOrderBean">
+        <id column="id" property="longId"/>
+        <result column="member_account_id" property="longMemberAccountId"/>
+        <result column="order_code" property="strOrderCode"/>
+        <result column="product_list_json" property="strProductListJson"/>
+        <result column="total_price" property="intTotalPrice"/>
+        <result column="pay_price" property="intPayPrice"/>
+        <result column="address_json" property="strAddressJson"/>
+        <result column="status" property="intStatus"/>
+        <result column="created_time" property="longCreatedTime"/>
+        <result column="updated_time" property="longUpdatedTime"/>
+        <result column="is_deleted" property="intIsDeleted"/>
+        <result column="deleted_time" property="longDeletedTime"/>
+    </resultMap>
+
+    <select id="select" resultMap="shopOrderMap">
+        select * from shop_order
+        <where>
+            is_deleted = 0
+            <if test="longMemberAccountId != null">
+                and member_account_id = #{longMemberAccountId}
+            </if>
+            <if test="intStatus != null">
+                and status = #{intStatus}
+            </if>
+            <if test="strOrderCode != null and strOrderCode != ''">
+                and order_code = #{strOrderCode}
+            </if>
+        </where>
+        order by created_time desc
+    </select>
+
+    <select id="selectOne" resultMap="shopOrderMap">
+        select * from shop_order
+        <where>
+            is_deleted = 0
+            <if test="longId != null">
+                and id = #{longId}
+            </if>
+            <if test="longMemberAccountId != null">
+                and member_account_id = #{longMemberAccountId}
+            </if>
+            <if test="strOrderCode != null and strOrderCode != ''">
+                and order_code = #{strOrderCode}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into shop_order(id, member_account_id, order_code, product_list_json, total_price,
+                               pay_price, address_json, status, created_time, updated_time,
+                               is_deleted, deleted_time)
+        values (#{longId}, #{longMemberAccountId}, #{strOrderCode}, #{strProductListJson}, #{intTotalPrice},
+                #{intPayPrice}, #{strAddressJson}, #{intStatus}, #{longCreatedTime}, #{longUpdatedTime},
+                #{intIsDeleted}, #{longDeletedTime})
+    </insert>
+
+    <update id="update">
+        update shop_order
+        <set>
+            <if test="strOrderCode != null and strOrderCode != ''">
+                order_code = #{strOrderCode},
+            </if>
+            <if test="strProductListJson != null">
+                product_list_json = #{strProductListJson},
+            </if>
+            <if test="intTotalPrice != null">
+                total_price = #{intTotalPrice},
+            </if>
+            <if test="intPayPrice != null">
+                pay_price = #{intPayPrice},
+            </if>
+            <if test="strAddressJson != null">
+                address_json = #{strAddressJson},
+            </if>
+            <if test="intStatus != null">
+                status = #{intStatus},
+            </if>
+            <if test="longUpdatedTime != null">
+                updated_time = #{longUpdatedTime},
+            </if>
+            <if test="intIsDeleted != null">
+                is_deleted = #{intIsDeleted},
+            </if>
+            <if test="longDeletedTime != null">
+                deleted_time = #{longDeletedTime},
+            </if>
+        </set>
+        where id = #{longId}
+        <if test="longMemberAccountId != null">
+            and member_account_id = #{longMemberAccountId}
+        </if>
+    </update>
+
+    <delete id="delete">
+        update shop_order
+        set is_deleted = 1,
+            deleted_time = #{longDeletedTime},
+            updated_time = #{longUpdatedTime}
+        where id = #{longId}
+        <if test="longMemberAccountId != null">
+            and member_account_id = #{longMemberAccountId}
+        </if>
+    </delete>
+
+</mapper>

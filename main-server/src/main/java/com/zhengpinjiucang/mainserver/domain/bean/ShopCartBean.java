@@ -2,6 +2,8 @@ package com.zhengpinjiucang.mainserver.domain.bean;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ShopCartBean {
 
@@ -13,5 +15,7 @@ public class ShopCartBean {
     private Long longUpdatedTime;
 
     private ProductBean productBean;
+
+    private List<Long> idList;
 
 }
