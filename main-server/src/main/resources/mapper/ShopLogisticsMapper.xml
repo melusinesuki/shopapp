@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.ShopLogisticsMapper">
+
+    <select id="select">
+        select * from shop_logistics
+        <where>
+            <if test="intStatus != null">
+                status = #{intStatus}
+            </if>
+            <if test="longShopOrderId != null">
+                shop_order_id = #{longShopOrderId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOne">
+        select * from shop_logistics
+        <where>
+            <if test="longId != null">
+                id = #{longId}
+            </if>
+            <if test="longShopOrderId != null">
+                shop_order_id = #{longShopOrderId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into shop_logistics values
+           (#{longId}, #{longShopOrderId}, #{strCode}, #{intStatus}, #{strContent}, #{longUpdatedTime}, #{longCreatedTime})
+    </insert>
+
+    <update id="update">
+        update shop_logistics
+        <set>
+            <if test="intStatus != null">
+                status = #{intStatus},
+            </if>
+            <if test="strContent != null">
+                content = #{strContent},
+            </if>
+            updated_time = #{longUpdatedTime}
+        </set>
+        <where>
+            <if test="longId != null">
+                id = #{longId}
+            </if>
+            <if test="longShopOrderId != null">
+                shop_order_id = #{longShopOrderId}
+            </if>
+        </where>
+    </update>
+
+</mapper>

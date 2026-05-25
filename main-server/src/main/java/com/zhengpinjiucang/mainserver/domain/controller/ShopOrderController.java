@@ -9,12 +9,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 public class ShopOrderController {
 
     @Autowired
     private ShopOrderService shopOrderService;
+
+    @RequestMapping("/shop-order/list-all")
+    public ResultBean listAll() {
+        log.info("/shop-order/list-all,订单完整列表,请求参数:null");
+        List<ShopOrderBean> list = shopOrderService.listAll();
+        log.info("/shop-order/list-all,订单完整列表,返回值:{}", list);
+        return new ResultBean(200, "查询成功", list);
+    }
 
     @RequestMapping("/shop-order/save")
     public ResultBean saveShopOrder(@RequestBody ShopOrderBean bean) {

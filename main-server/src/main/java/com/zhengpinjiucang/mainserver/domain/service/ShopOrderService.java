@@ -7,10 +7,12 @@ import com.zhengpinjiucang.mainserver.common.util.SecurityUtils;
 import com.zhengpinjiucang.mainserver.domain.bean.MemberAddressBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ProductBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ShopCartBean;
+import com.zhengpinjiucang.mainserver.domain.bean.ShopLogisticsBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ShopOrderBean;
 import com.zhengpinjiucang.mainserver.domain.mapper.MemberAddressMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ProductMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ShopCartMapper;
+import com.zhengpinjiucang.mainserver.domain.mapper.ShopLogisticsMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ShopOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,17 @@ public class ShopOrderService {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private ShopLogisticsMapper shopLogisticsMapper;
+
+    public List<ShopOrderBean> listAll() {
+        log.debug("订单完整列表,补充参数");
+        ShopOrderBean bean = new ShopOrderBean();
+        bean.setLongMemberAccountId(SecurityUtils.getId());
+        log.debug("订单完整列表,执行查询");
+        return shopOrderMapper.select(bean);
+    }
 
     public ShopOrderBean save(ShopOrderBean bean) {
         log.debug("订单保存,检查参数,检查地址");
@@ -111,8 +124,18 @@ public class ShopOrderService {
         }
 
         if (shopOrderBeanResult.getIntStatus() == 0) {
-            shopOrderBeanResult.setIntStatus(1);
+            shopOrderBeanResult.setIntStatus(2);
             shopOrderMapper.update(shopOrderBeanResult);
+            // 模拟支付成功, 自动发货, 增加一条物流信息数据
+            ShopLogisticsBean shopLogisticsBean = new ShopLogisticsBean();
+            shopLogisticsBean.setLongId(IdUtil.getSnowflakeNextId());
+            shopLogisticsBean.setLongShopOrderId(shopOrderBeanResult.getLongId());
+            shopLogisticsBean.setStrCode("YT8871701153792");
+            shopLogisticsBean.setIntStatus(0);
+            shopLogisticsBean.setStrContent("");
+            shopLogisticsBean.setLongCreatedTime(System.currentTimeMillis());
+            shopLogisticsBean.setLongUpdatedTime(System.currentTimeMillis());
+            shopLogisticsMapper.insert(shopLogisticsBean);
         }
     }
 }
