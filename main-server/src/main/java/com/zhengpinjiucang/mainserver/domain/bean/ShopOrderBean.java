@@ -24,4 +24,5 @@ public class ShopOrderBean {
 
     private Long longAddressId;
     private List<Long> shopCartIdList;
+    private List<Long> productIdList;
 }

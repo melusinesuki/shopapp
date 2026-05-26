@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -55,7 +56,8 @@ public class ShopOrderService {
         if (bean.getLongAddressId() == null) {
             throw new NormalException("参数错误");
         }
-        if (bean.getShopCartIdList() == null || bean.getShopCartIdList().isEmpty()) {
+        if ((bean.getShopCartIdList() == null || bean.getShopCartIdList().isEmpty())
+                && (bean.getProductIdList() == null || bean.getProductIdList().isEmpty())) {
             throw new NormalException("参数错误");
         }
         log.debug("订单保存,查询必要信息");
@@ -67,25 +69,44 @@ public class ShopOrderService {
             throw new NormalException("参数错误");
         }
 
-        ShopCartBean shopCartBean = new ShopCartBean();
-        shopCartBean.setLongMemberAccountId(SecurityUtils.getId());
-        shopCartBean.setIdList(bean.getShopCartIdList());
-        List<ShopCartBean> shopCartBeanList = shopCartMapper.select(shopCartBean);
-        if (shopCartBeanList == null || shopCartBeanList.isEmpty()) {
-            throw new NormalException("参数错误");
-        }
-        log.debug("订单保存,查询商品");
-        log.debug("订单保存,计算总价格");
         int totalPrice = 0;
-        for (ShopCartBean cartBean : shopCartBeanList) {
-            ProductBean productBean = new ProductBean();
-            productBean.setLongId(cartBean.getLongProductId());
-            ProductBean productBeanResult = productMapper.selectOne(productBean);
-            if (productBeanResult == null) {
-                throw new NormalException("商品已经下架");
+        List<ShopCartBean> shopCartBeanList = new ArrayList<>();
+
+        if (bean.getShopCartIdList() != null && !bean.getShopCartIdList().isEmpty()) {
+            ShopCartBean shopCartBean = new ShopCartBean();
+            shopCartBean.setLongMemberAccountId(SecurityUtils.getId());
+            shopCartBean.setIdList(bean.getShopCartIdList());
+            shopCartBeanList = shopCartMapper.select(shopCartBean);
+            if (shopCartBeanList == null || shopCartBeanList.isEmpty()) {
+                throw new NormalException("参数错误");
             }
-            cartBean.setProductBean(productBeanResult);
-            totalPrice += productBeanResult.getIntPrice() * cartBean.getIntNum();
+            for (ShopCartBean cartBean : shopCartBeanList) {
+                ProductBean productBean = new ProductBean();
+                productBean.setLongId(cartBean.getLongProductId());
+                ProductBean productBeanResult = productMapper.selectOne(productBean);
+                if (productBeanResult == null) {
+                    throw new NormalException("商品已经下架");
+                }
+                cartBean.setProductBean(productBeanResult);
+                totalPrice += productBeanResult.getIntPrice() * cartBean.getIntNum();
+            }
+        }
+
+        if (bean.getProductIdList() != null && !bean.getProductIdList().isEmpty()) {
+            for (Long productId : bean.getProductIdList()) {
+                ProductBean productBean = new ProductBean();
+                productBean.setLongId(productId);
+                ProductBean productBeanResult = productMapper.selectOne(productBean);
+                if (productBeanResult == null) {
+                    throw new NormalException("商品已经下架");
+                }
+                totalPrice += productBeanResult.getIntPrice();
+                ShopCartBean cartBean = new ShopCartBean();
+                cartBean.setProductBean(productBeanResult);
+                cartBean.setLongProductId(productId);
+                cartBean.setIntNum(1);
+                shopCartBeanList.add(cartBean);
+            }
         }
 
         log.debug("保存订单,补充订单信息");
@@ -110,7 +131,9 @@ public class ShopOrderService {
 
         log.info("订单保存,删除购物车数据");
         for (ShopCartBean cartBean : shopCartBeanList) {
-            shopCartMapper.delete(cartBean);
+            if (cartBean.getLongId() != null) {
+                shopCartMapper.delete(cartBean);
+            }
         }
 
         return shopOrderBean;

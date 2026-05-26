@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.SystemMessageMapper">
+
+    <resultMap id="systemMessageMap" type="com.zhengpinjiucang.mainserver.domain.bean.SystemMessageBean">
+        <id column="id" property="longId"/>
+        <result column="target_type" property="intTargetType"/>
+        <result column="biz_type" property="intBizType"/>
+        <result column="member_account_id" property="longMemberAccountId"/>
+        <result column="status" property="intStatus"/>
+        <result column="channel" property="intChannel"/>
+        <result column="email" property="strEmail"/>
+        <result column="path" property="strPath"/>
+        <result column="title" property="strTitle"/>
+        <result column="content" property="strContent"/>
+        <result column="created_time" property="longCreatedTime"/>
+        <result column="updated_time" property="longUpdatedTime"/>
+    </resultMap>
+
+    <select id="select" resultMap="systemMessageMap">
+        select * from system_message
+        <where>
+            <if test="intTargetType != null">
+                target_type = #{intTargetType}
+            </if>
+            <if test="intBizType != null">
+              and  biz_type = #{intBizType}
+            </if>
+            <if test="longMemberAccountId != null">
+               and member_account_id = #{longMemberAccountId}
+            </if>
+            <if test="intStatus != null">
+                and status = #{intStatus}
+            </if>
+            <if test="intChannel != null">
+                and channel = #{intChannel}
+            </if>
+            <if test="longLastCreatedTime != null">
+                and created_time &lt; #{longLastCreatedTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOne" resultMap="systemMessageMap">
+        select * from system_message where id = #{longId}
+    </select>
+
+    <insert id="insert">
+        insert into system_message values(
+                  #{longId},#{intTargetType},#{intBizType}, #{longMemberAccountId},
+                  #{intStatus},#{intChannel},#{strEmail},#{strPath},
+                  #{strTitle},#{strContent},#{longCreatedTime},
+                  #{longUpdatedTime} )
+    </insert>
+
+    <update id="update">
+        update system_message
+        <set>
+            status = #{intStatus},
+            updated_time  = #{longUpdatedTime}
+        </set>
+        where id = #{longId}
+    </update>
+
+</mapper>

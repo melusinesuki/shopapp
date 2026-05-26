@@ -168,6 +168,7 @@ public class MemberAccountService {
         if (result == null) {
             throw new NormalException("用户不存在");
         }
+        result.setStrPasswordHash(null);
         return result;
     }
 
