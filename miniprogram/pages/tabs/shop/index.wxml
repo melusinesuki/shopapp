@@ -1,0 +1,46 @@
+
+<view class="search-bar">
+  <view class="search-input">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-field"
+      placeholder="搜索商品名称"
+      placeholder-class="search-placeholder"
+      value="{{title}}"
+      bind:input="changeTitle"
+      bind:confirm="search"
+    />
+  </view>
+  <button class="search-btn" bind:tap="search">搜索</button>
+</view>
+
+<view class="filter">
+  <button bind:tap="changesort" data-orderby="created_at desc">最新上架</button>
+  <button bind:tap="changesort" data-orderby="int_price asc">低价优先</button>
+  <button bind:tap="changesort" data-orderby="sales desc">最畅销</button>
+</view>
+<!-- 商品网格 -->
+<view class="product-grid">
+  <view class="product-card" wx:for="{{products}}" wx:key="longId"            
+  bind:tap="toDetail" data-id="{{item.longId}}">  
+    <image class="card-image" src="{{item.strSurface}}" mode="aspectFill" lazy-load></image>
+    <view class="card-info">
+      <view class="card-title">{{item.strTitle}}</view>
+      <view class="card-bottom">
+        <view class="card-price">
+          <text class="price-symbol">¥</text>
+          <text class="price-value">{{item.intPrice / 100}}</text>
+        </view>
+        <view class="card-cart-btn" catch:tap="addToCart" data-id="{{item.longId}}">
+          <text>🛒</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 空状态 -->
+<view class="empty" wx:if="{{products.length === 0 && !loading}}">
+  <text class="empty-icon">📦</text>
+  <text class="empty-text">暂无商品</text>
+</view>

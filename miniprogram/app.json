@@ -1,15 +1,82 @@
 {
   "pages": [
     "pages/tabs/index/index",
-    "pages/index/product-detail/index"
+    "pages/tabs/shop/index",
+    "pages/tabs/shop-cart/index",
+    "pages/tabs/message/index",
+    "pages/tabs/mine/index"
+  ],
+  "subPackages": [
+    {
+      "root": "pages/shop",
+      "pages": [
+        "product-detail/index",
+        "checkout/index",
+        "address-select/index"
+      ]
+    },
+    {
+      "root": "pages/mine",
+      "pages": [
+        "login/index",
+        "address-list/index",
+        "address-edit/index",
+        "order-list/index"
+      ]
+    }
   ],
   "window": {
     "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "navigationBarTitleText": "优选商城",
+    "navigationBarBackgroundColor": "#ff4757"
   },
   "style": "v2",
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "entryPagePath": "pages/tabs/index/index",
+  "resolveAlias": {
+    "@/*": "/*"
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#ff4757",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/tabs/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/tabs/shop/index",
+        "text": "购物",
+        "iconPath": "images/shop.png",
+        "selectedIconPath": "images/shop-active.png"
+      },
+      {
+        "pagePath": "pages/tabs/shop-cart/index",
+        "text": "购物车",
+        "iconPath": "images/cart.png",
+        "selectedIconPath": "images/cart-active.png"
+      },
+      {
+        "pagePath": "pages/tabs/message/index",
+        "text": "通知",
+        "iconPath": "images/message.png",
+        "selectedIconPath": "images/message-active.png"
+      },
+      {
+        "pagePath": "pages/tabs/mine/index",
+        "text": "我的",
+        "iconPath": "images/mine.png",
+        "selectedIconPath": "images/mine-active.png"
+      }
+    ]
+  }
 }
