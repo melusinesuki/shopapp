@@ -29,8 +29,8 @@
     </select>
 
     <insert id="insert">
-        insert into shop_logistics values
-           (#{longId}, #{longShopOrderId}, #{strCode}, #{intStatus}, #{strContent}, #{longUpdatedTime}, #{longCreatedTime})
+        insert into shop_logistics(id, shop_order_id, code, member_account_id, status, content, updated_time, created_time)
+        values (#{longId}, #{longShopOrderId}, #{strCode}, #{longMemberAccountId}, #{intStatus}, #{strContent}, #{longUpdatedTime}, #{longCreatedTime})
     </insert>
 
     <update id="update">

@@ -9,14 +9,18 @@ import com.zhengpinjiucang.mainserver.domain.bean.ProductBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ShopCartBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ShopLogisticsBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ShopOrderBean;
+import com.zhengpinjiucang.mainserver.domain.bean.ShopOrderItemBean;
 import com.zhengpinjiucang.mainserver.domain.mapper.MemberAddressMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ProductMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ShopCartMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ShopLogisticsMapper;
+import com.zhengpinjiucang.mainserver.domain.mapper.ShopOrderItemMapper;
 import com.zhengpinjiucang.mainserver.domain.mapper.ShopOrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -43,6 +47,12 @@ public class ShopOrderService {
     @Autowired
     private ShopLogisticsMapper shopLogisticsMapper;
 
+    @Autowired
+    private ShopOrderItemMapper shopOrderItemMapper;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     public List<ShopOrderBean> listAll() {
         log.debug("订单完整列表,补充参数");
         ShopOrderBean bean = new ShopOrderBean();
@@ -51,6 +61,13 @@ public class ShopOrderService {
         return shopOrderMapper.select(bean);
     }
 
+    public List<ShopOrderItemBean> listItems(Long orderId) {
+        ShopOrderItemBean bean = new ShopOrderItemBean();
+        bean.setLongShopOrderId(orderId);
+        return shopOrderItemMapper.select(bean);
+    }
+
+    @Transactional
     public ShopOrderBean save(ShopOrderBean bean) {
         log.debug("订单保存,检查参数,检查地址");
         if (bean.getLongAddressId() == null) {
@@ -129,6 +146,22 @@ public class ShopOrderService {
             throw new NormalException("下单失败");
         }
 
+        log.debug("订单保存,写入订单商品明细");
+        List<ShopOrderItemBean> orderItems = new ArrayList<>();
+        for (ShopCartBean cartBean : shopCartBeanList) {
+            ShopOrderItemBean item = new ShopOrderItemBean();
+            item.setLongId(IdUtil.getSnowflakeNextId());
+            item.setLongShopOrderId(shopOrderBean.getLongId());
+            item.setLongProductId(cartBean.getLongProductId());
+            item.setStrProductTitle(cartBean.getProductBean().getStrTitle());
+            item.setIntProductPrice(cartBean.getProductBean().getIntPrice());
+            item.setStrProductImage(cartBean.getProductBean().getStrSurface());
+            item.setIntNum(cartBean.getIntNum());
+            item.setLongCreatedTime(System.currentTimeMillis());
+            orderItems.add(item);
+        }
+        shopOrderItemMapper.insertBatch(orderItems);
+
         log.info("订单保存,删除购物车数据");
         for (ShopCartBean cartBean : shopCartBeanList) {
             if (cartBean.getLongId() != null) {
@@ -139,6 +172,54 @@ public class ShopOrderService {
         return shopOrderBean;
     }
 
+    @Transactional
+    public void cancel(ShopOrderBean bean) {
+        log.debug("取消订单,检查参数");
+        if (bean.getLongId() == null) {
+            throw new NormalException("参数错误");
+        }
+        bean.setLongMemberAccountId(SecurityUtils.getId());
+        ShopOrderBean orderResult = shopOrderMapper.selectOne(bean);
+        if (orderResult == null) {
+            throw new NormalException("订单不存在");
+        }
+
+        int currentStatus = orderResult.getIntStatus();
+        if (currentStatus == 0) {
+            // 待支付 → 已取消
+            orderResult.setIntStatus(3);
+        } else if (currentStatus == 1) {
+            // 已支付 → 退款中
+            orderResult.setIntStatus(4);
+        } else {
+            throw new NormalException("当前订单状态不允许取消");
+        }
+        orderResult.setLongUpdatedTime(System.currentTimeMillis());
+        shopOrderMapper.update(orderResult);
+        log.info("订单已取消, orderId:{}, oldStatus:{}, newStatus:{}",
+                bean.getLongId(), currentStatus, orderResult.getIntStatus());
+    }
+
+    @Transactional
+    public void delete(ShopOrderBean bean) {
+        log.debug("删除订单,检查参数");
+        if (bean.getLongId() == null) {
+            throw new NormalException("参数错误");
+        }
+        bean.setLongMemberAccountId(SecurityUtils.getId());
+        ShopOrderBean orderResult = shopOrderMapper.selectOne(bean);
+        if (orderResult == null) {
+            throw new NormalException("订单不存在");
+        }
+        Long orderId = orderResult.getLongId();
+        Long memberAccountId = orderResult.getLongMemberAccountId();
+        jdbcTemplate.update("DELETE FROM shop_order_item WHERE shop_order_id = ?", orderId);
+        jdbcTemplate.update("DELETE FROM shop_order WHERE id = ? AND member_account_id = ?",
+                orderId, memberAccountId);
+        log.info("订单已删除, orderId:{}", orderId);
+    }
+
+    @Transactional
     public void checkPayStatus(ShopOrderBean bean) {
         bean.setLongMemberAccountId(SecurityUtils.getId());
         ShopOrderBean shopOrderBeanResult = shopOrderMapper.selectOne(bean);
@@ -153,6 +234,7 @@ public class ShopOrderService {
             ShopLogisticsBean shopLogisticsBean = new ShopLogisticsBean();
             shopLogisticsBean.setLongId(IdUtil.getSnowflakeNextId());
             shopLogisticsBean.setLongShopOrderId(shopOrderBeanResult.getLongId());
+            shopLogisticsBean.setLongMemberAccountId(SecurityUtils.getId());
             shopLogisticsBean.setStrCode("YT8871701153792");
             shopLogisticsBean.setIntStatus(0);
             shopLogisticsBean.setStrContent("");

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengpinjiucang.mainserver.domain.mapper.ShopOrderItemMapper">
+
+    <resultMap id="shopOrderItemMap"
+               type="com.zhengpinjiucang.mainserver.domain.bean.ShopOrderItemBean">
+        <id column="id" property="longId"/>
+        <result column="shop_order_id" property="longShopOrderId"/>
+        <result column="product_id" property="longProductId"/>
+        <result column="product_title" property="strProductTitle"/>
+        <result column="product_price" property="intProductPrice"/>
+        <result column="product_image" property="strProductImage"/>
+        <result column="num" property="intNum"/>
+        <result column="created_time" property="longCreatedTime"/>
+    </resultMap>
+
+    <select id="select" resultMap="shopOrderItemMap">
+        select * from shop_order_item
+        <where>
+            <if test="longShopOrderId != null">
+                and shop_order_id = #{longShopOrderId}
+            </if>
+            <if test="longProductId != null">
+                and product_id = #{longProductId}
+            </if>
+        </where>
+        order by created_time
+    </select>
+
+    <insert id="insert">
+        insert into shop_order_item(id, shop_order_id, product_id, product_title, product_price, product_image, num, created_time)
+        values (#{longId}, #{longShopOrderId}, #{longProductId}, #{strProductTitle}, #{intProductPrice}, #{strProductImage}, #{intNum}, #{longCreatedTime})
+    </insert>
+
+    <insert id="insertBatch">
+        insert into shop_order_item(id, shop_order_id, product_id, product_title, product_price, product_image, num, created_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.longId}, #{item.longShopOrderId}, #{item.longProductId}, #{item.strProductTitle}, #{item.intProductPrice}, #{item.strProductImage}, #{item.intNum}, #{item.longCreatedTime})
+        </foreach>
+    </insert>
+
+</mapper>

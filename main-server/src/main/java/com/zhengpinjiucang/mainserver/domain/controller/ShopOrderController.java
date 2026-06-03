@@ -2,6 +2,7 @@ package com.zhengpinjiucang.mainserver.domain.controller;
 
 import com.zhengpinjiucang.mainserver.common.bean.ResultBean;
 import com.zhengpinjiucang.mainserver.domain.bean.ShopOrderBean;
+import com.zhengpinjiucang.mainserver.domain.bean.ShopOrderItemBean;
 import com.zhengpinjiucang.mainserver.domain.service.ShopOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,29 @@ public class ShopOrderController {
         shopOrderService.checkPayStatus(bean);
         log.info("/shop-order/check-pay-status,检查支付结果,返回值:null");
         return new ResultBean(200, "支付成功", null);
+    }
+
+    @RequestMapping("/shop-order/cancel")
+    public ResultBean cancel(@RequestBody ShopOrderBean bean) {
+        log.info("/shop-order/cancel,取消订单,请求参数:{}", bean);
+        shopOrderService.cancel(bean);
+        log.info("/shop-order/cancel,取消订单,返回值:null");
+        return new ResultBean(200, "取消成功", null);
+    }
+
+    @RequestMapping("/shop-order/delete")
+    public ResultBean delete(@RequestBody ShopOrderBean bean) {
+        log.info("/shop-order/delete,删除订单,请求参数:{}", bean);
+        shopOrderService.delete(bean);
+        log.info("/shop-order/delete,删除订单,返回值:null");
+        return new ResultBean(200, "删除成功", null);
+    }
+
+    @RequestMapping("/shop-order/items")
+    public ResultBean items(@RequestBody ShopOrderBean bean) {
+        log.info("/shop-order/items,订单明细,请求参数:{}", bean);
+        List<ShopOrderItemBean> items = shopOrderService.listItems(bean.getLongId());
+        log.info("/shop-order/items,订单明细,返回值:{}", items);
+        return new ResultBean(200, "查询成功", items);
     }
 }

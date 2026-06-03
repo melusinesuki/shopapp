@@ -5,14 +5,14 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class ShopLogisticsBean {
+public class ShopOrderItemBean {
 
     private Long longId;
     private Long longShopOrderId;
-    private Long longMemberAccountId;
-    private String strCode;
-    private Integer intStatus;
-    private String strContent;
-    private Long longUpdatedTime;
+    private Long longProductId;
+    private String strProductTitle;
+    private Integer intProductPrice;
+    private String strProductImage;
+    private Integer intNum;
     private Long longCreatedTime;
 }
